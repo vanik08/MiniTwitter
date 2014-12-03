@@ -28,7 +28,7 @@ public class User extends javax.swing.JFrame implements UserEntity,
     private String id;
     private long creationTime;
     private long lastUpdateTime;
-    
+ 
     public User(Admin admin, String name) {
         
         this.setTitle(name);
@@ -72,6 +72,13 @@ public class User extends javax.swing.JFrame implements UserEntity,
         }       
         newsFeedList.setModel(newsfeedModel);
 
+    }
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
     }
     /**
      * This method is called from within the constructor to initialize the form.

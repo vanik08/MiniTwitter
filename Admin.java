@@ -404,6 +404,21 @@ public class Admin extends javax.swing.JFrame {
                
         return (unique && noSpaces);
     }
+    public String findLastUserToUpdate() {
+        String id = "";
+        long time = 0;
+        
+        Iterator i = users.entrySet().iterator();
+        while(i.hasNext()) {
+            Map.Entry pairs = (Map.Entry)i.next();
+            User nextUser = (User)pairs.getValue();
+            if(nextUser.getLastUpdateTime() > time) {
+                time = nextUser.getLastUpdateTime();
+                id = nextUser.getId();
+            }
+        }      
+        return id;
+    }
     private void userIdTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userIdTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_userIdTextFieldActionPerformed
@@ -470,7 +485,8 @@ public class Admin extends javax.swing.JFrame {
     }//GEN-LAST:event_verifyIdBtnActionPerformed
 
     private void lastUpdateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastUpdateBtnActionPerformed
-       
+        String lastUserToUpdate = this.findLastUserToUpdate();
+        JOptionPane.showMessageDialog(null, "ID: " + lastUserToUpdate);
     }//GEN-LAST:event_lastUpdateBtnActionPerformed
 
     /**
