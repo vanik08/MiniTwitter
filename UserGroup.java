@@ -16,17 +16,19 @@ public class UserGroup implements UserEntity, UserEntityElement{
 
     private String name;
     private ArrayList<UserEntity> users = new ArrayList<UserEntity>();
-    private int id;
+    private String id;
+    private long currentTime;
     
     public UserGroup(String name) {
         this.name = name;
+        this.currentTime = System.currentTimeMillis();
     }
-    public void setUserId(int id) {
+    public void setUserId(String id) {
         this.id = id;
     }
     @Override
     public String getId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return id;
     }
     public String toString() {
         return name;

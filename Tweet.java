@@ -9,8 +9,6 @@ package minitwitter;
 public class Tweet implements UserEntityElement{
     
     private User user;
-
-    
     private String tweet;
     
     public Tweet(User user, String tweet) {

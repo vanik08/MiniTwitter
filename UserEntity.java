@@ -13,5 +13,5 @@ package minitwitter;
 public interface UserEntity {
     public String getId();
     public void setName(String name);
-    public void setUserId(int id);
+    public void setUserId(String id);
 }

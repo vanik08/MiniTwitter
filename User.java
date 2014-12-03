@@ -8,6 +8,8 @@ package minitwitter;
 
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.ListModel;
 
 /**
  *
@@ -17,31 +19,35 @@ public class User extends javax.swing.JFrame implements UserEntity,
         Observer, Subject, UserEntityElement {
 
     private String name;
-    private int id;
-    private ArrayList<User> followers = new ArrayList<>();
     private ArrayList<User> followings = new ArrayList<>();
+    private ArrayList<User> followers = new ArrayList<>();
     private ArrayList<String> tweets = new ArrayList<>();
     private ArrayList<Tweet> newsfeed = new ArrayList<>(); 
     private Admin admin;
-    private DefaultListModel followersModel, newsfeedModel;
+    private DefaultListModel followingModel, newsfeedModel;
+    private String id;
+    private long creationTime;
+    private long lastUpdateTime;
     
     public User(Admin admin, String name) {
         
         this.setTitle(name);
         this.name = name;
-        this.id = id;
         this.admin = admin;
+        this.id = "user:" + name;
+        this.creationTime = System.currentTimeMillis();
         initComponents();
-        followersModel = new DefaultListModel();
+        creationTimeLabel.setText("Creation Time: " + creationTime);
+        followingModel = new DefaultListModel();
         newsfeedModel = new DefaultListModel();        
         setFollowersModel(); 
         setNewsfeedModel(); 
-        followers.add(this);
+        followings.add(this);
     }
-    public int getUserId() {
+    public String getId() {
         return id;
     }
-    public void setUserId(int id) {
+    public void setUserId(String id) {
         this.id = id;
     }
     public ArrayList<Tweet> getNewsfeed() {
@@ -50,24 +56,22 @@ public class User extends javax.swing.JFrame implements UserEntity,
     public void setNewsfeed(ArrayList<Tweet> newsfeed) {
         this.newsfeed = newsfeed;
     }
-    public void setFollowersModel() {             
-        followersModel.clear();
-        for(int i=0; i < followers.size(); i++)
-            followersModel.addElement(followers.get(i).toString());
-        
-        currentFollowingList.setModel(followersModel);      
+    public void setFollowersModel() { 
+                
+        followingModel.clear();
+        for(int i=0; i < followings.size(); i++) {
+            followingModel.addElement(followings.get(i).toString());
+        }
+        currentFollowingList.setModel(followingModel);      
     }
     public void setNewsfeedModel() {  
-       
+        
         newsfeedModel.clear();
         for(int i=0; i < newsfeed.size(); i++) { 
-            for(int j=0; j < followers.size(); j++) {
-                if(followers.get(j).equals(newsfeed.get(i).getUser()))
-                    newsfeedModel.addElement(newsfeed.get(i).toString());
-            }
-        }
-        
+            newsfeedModel.addElement(newsfeed.get(i).toString());  
+        }       
         newsFeedList.setModel(newsfeedModel);
+
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -87,6 +91,8 @@ public class User extends javax.swing.JFrame implements UserEntity,
         tweetMessageTextArea = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         newsFeedList = new javax.swing.JList();
+        creationTimeLabel = new javax.swing.JLabel();
+        lastUpdateLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -128,6 +134,10 @@ public class User extends javax.swing.JFrame implements UserEntity,
         });
         jScrollPane3.setViewportView(newsFeedList);
 
+        creationTimeLabel.setText("Creation Time");
+
+        lastUpdateLabel.setText("Last Update");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -135,18 +145,26 @@ public class User extends javax.swing.JFrame implements UserEntity,
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(followTextField)
-                        .addGap(18, 18, 18)
-                        .addComponent(followUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3)
+                            .addComponent(jScrollPane1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(followTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(followUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(postTweetBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 35, Short.MAX_VALUE)))
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(postTweetBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(creationTimeLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lastUpdateLabel)
+                        .addGap(112, 112, 112))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -155,8 +173,12 @@ public class User extends javax.swing.JFrame implements UserEntity,
                     .addComponent(followTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(followUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(25, 25, 25)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(creationTimeLabel)
+                    .addComponent(lastUpdateLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(postTweetBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE))
@@ -176,7 +198,7 @@ public class User extends javax.swing.JFrame implements UserEntity,
         String name = followTextField.getText();
         followTextField.setText("");
         User user = admin.getUser().get(name);
-        followers.add(user);
+        followings.add(user);
         setFollowersModel();
     }//GEN-LAST:event_followUserBtnActionPerformed
 
@@ -185,11 +207,9 @@ public class User extends javax.swing.JFrame implements UserEntity,
         Tweet tweet = new Tweet(this, this.name + ": " + tweetMsg);
         newsfeed.add(tweet);  
         this.notifi();
-        this.setNewsfeedModel();
-        
+     
         admin.getTweets().add(tweet);       
-        findPositives(tweet);
-        
+        findPositives(tweet);      
         admin.updateStats();
     }//GEN-LAST:event_postTweetBtnActionPerformed
     public void findPositives(Tweet tweet) {
@@ -206,21 +226,20 @@ public class User extends javax.swing.JFrame implements UserEntity,
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel creationTimeLabel;
     private javax.swing.JList currentFollowingList;
     private javax.swing.JTextField followTextField;
     private javax.swing.JButton followUserBtn;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel lastUpdateLabel;
     private javax.swing.JList newsFeedList;
     private javax.swing.JButton postTweetBtn;
     private javax.swing.JTextArea tweetMessageTextArea;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public String getId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+
     public String toString() {
         return name;
     }
@@ -228,10 +247,13 @@ public class User extends javax.swing.JFrame implements UserEntity,
     public void update(Subject sub) {      
         if(sub instanceof User) {
             User user = (User) sub;
-            for(int i=0; i < followers.size(); i++) {
-                if(followers.get(i).equals(user)) {
+            for(int i=0; i < followings.size(); i++) {
+                if(followings.get(i).getId()==user.getId()) {
                     newsfeed = user.getNewsfeed();
                     this.setNewsfeedModel();
+                    lastUpdateTime = System.currentTimeMillis();
+                    lastUpdateLabel.setText("Last Update: " + lastUpdateTime);
+                    admin.setLastUpdate(lastUpdateTime);
                 }
             }
             

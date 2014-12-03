@@ -6,6 +6,8 @@
 
 package minitwitter;
 
+import java.text.DecimalFormat;
+
 /**
  *
  * @author vanik
@@ -45,8 +47,11 @@ public class UserEntityStatVisitor implements UserEntityElementVisitor {
         return tweetTotal;
     }
 
-    public int getPositiveTotal() {
-        return positiveTotal;
+    public double getPositiveTotal() {
+        if(positiveTotal != 0)
+            return ((double)positiveTotal/tweetTotal)*100;
+        else
+            return 0;
     }
     @Override
     public void visit(User user) {
@@ -65,7 +70,7 @@ public class UserEntityStatVisitor implements UserEntityElementVisitor {
 
     @Override
     public void visit(PositiveMessages positives) {
-        setPositiveTotal(getPositiveTotal()+1);
+        setPositiveTotal((int)getPositiveTotal()+1);
     }
     
     
